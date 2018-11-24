@@ -106,9 +106,31 @@ ctx.fillStyle = "#FFF";
 ctx.strokeStyle = "#000";
 ctx.textAlign = "center";
 img.src = "meme.jpg";
-img.addEventListener("load", function (e) {
-    mock("");
-});
+img.addEventListener("load", function () {
+    // Shortcut for automatically generating from a search query
+    if (window.URLSearchParams == undefined || window.location.search.length == 0) {
+        mock("");
+        return;
+    }
+    var query = new window.URLSearchParams(window.location.search);
+    if (!query.has("mock")) {
+        mock("");
+        return;
+    }
+    var mockString = query.get("mock");
+    if(query.has("copyText")) {
+        input.value = mockString;
+        mock(mockString);
+        clipboard();
+    } else {
+        // Need to wait for the font to load
+        setTimeout(function () {
+            input.value = mockString;
+            mock(mockString);
+        }, 1000);
+    }
+    }
+);
 
 function clipboard () {
     output.select(); 
@@ -119,12 +141,15 @@ function clipboard () {
                 document.getElementById("clipboard-success").style.display = "none";
             }, 3000)
             return true;
+        } {
+            console.log("failed")
         }
-    } catch (e) {}
+    } catch (e) {console.error(e)}
 }
 
 input.addEventListener('keyup', function (e) { mock(e.target.value); });
 output.addEventListener('click', clipboard);
+
         </script>
         <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
